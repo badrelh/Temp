@@ -1,0 +1,57 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  sast-bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Bandit
+        run: pip install bandit[toml]
+      
+      - name: Run Bandit Scan
+        run: |
+          bandit -r . -f json -o bandit-report.json --exclude ./venv,./tests
+          bandit -r . -f html -o bandit-report.html --exclude ./venv,./tests
+        continue-on-error: true
+      
+      - name: Upload Bandit Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-security-report
+          path: |
+            bandit-report.json
+            bandit-report.html
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'movies-interface'
+          path: '.'
+          format: 'HTML'
+          args: |
+            --enableRetired
+            --scan requirements.txt
+
+      - name: Upload Dependency-Check Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: reports/
