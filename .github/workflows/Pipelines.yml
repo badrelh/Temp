@@ -42,12 +42,16 @@ jobs:
       - name: Run OWASP Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: 'movies-interface'
-          path: '.'
-          format: 'HTML'
-          args: >
-            --enableRetired
-            --scan requirements.txt
+            project: 'movies-interface'
+            path: '.'
+            format: 'HTML'
+            scan: './requirements.txt'
+            out: './reports'
+            failOnCVSS: 7
+            enableRetired: true
+
+
+
 
       - name: Upload Dependency-Check Report
         uses: actions/upload-artifact@v4
