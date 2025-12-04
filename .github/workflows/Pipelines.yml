@@ -65,3 +65,45 @@ jobs:
           path: |
             safety-report.json
             safety-report.txt
+
+  dast-zap:
+    name: DAST - OWASP ZAP Scan
+    runs-on: ubuntu-latest
+    needs: [sast-bandit, dependency-check]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Application
+        run: |
+          docker-compose up -d
+          echo "Waiting for services to be ready..."
+          sleep 40
+
+      - name: Verify Application is Running
+        run: |
+          curl -f http://localhost:5000 || (docker-compose logs && exit 1)
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:5000'
+          allow_issue_writing: false
+          fail_action: false
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-scan-report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+
+      - name: Show Application Logs
+        if: always()
+        run: docker-compose logs
+
+      - name: Stop Application
+        if: always()
+        run: docker-compose down -v
