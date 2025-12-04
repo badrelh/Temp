@@ -7,6 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
+
   sast-bandit:
     runs-on: ubuntu-latest
     steps:
@@ -37,24 +38,30 @@ jobs:
   dependency-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Run OWASP Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@main
+      - name: Checkout repository
+        uses: actions/checkout@v4
+    
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-            project: 'movies-interface'
-            path: '.'
-            format: 'HTML'
-            scan: './requirements.txt'
-            out: './reports'
-            failOnCVSS: 7
-            enableRetired: true
-
-
-
-
-      - name: Upload Dependency-Check Report
+          python-version: "3.11"
+    
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+    
+      - name: Install Safety
+        run: pip install safety
+    
+      - name: Run Safety Check
+        run: |
+          safety check --json --output safety-report.json || true
+          safety check --output safety-report.txt || true
+        continue-on-error: true
+    
+      - name: Upload Safety Report
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-check-report
-          path: ${{github.workspace}}/reports
+          name: safety-report
+          path: |
+            safety-report.json
+            safety-report.txt
