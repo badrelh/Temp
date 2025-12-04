@@ -54,8 +54,8 @@ jobs:
     
       - name: Run Safety Check
         run: |
-          safety check --json --output safety-report.json || true
-          safety check --output safety-report.txt || true
+          safety check --file=requirements.txt --json > safety-report.json || true
+          safety check --file=requirements.txt > safety-report.txt || true
         continue-on-error: true
     
       - name: Upload Safety Report
