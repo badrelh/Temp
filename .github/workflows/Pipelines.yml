@@ -136,11 +136,11 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: zap-scan-report
+          name: zapscanreport
           path: |
-            report_html.html
-            report_md.md
-            report_json.json
+            reporthtml.html
+            reportmd.md
+            reportjson.json
       
       - name: Show Application Logs
         if: always()
