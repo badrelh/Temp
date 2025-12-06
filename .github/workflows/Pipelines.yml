@@ -143,9 +143,9 @@ jobs:
         with:
           name: zapscanreport
           path: |
-            reporthtml.html
-            reportmd.md
-            reportjson.json
+            report_html.html
+            report_md.md
+            report_json.json
       
       - name: Show Application Logs
         if: always()
