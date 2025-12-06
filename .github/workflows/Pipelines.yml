@@ -80,10 +80,10 @@ jobs:
           echo "FLASK_DEBUG=false" >> .env
       
       - name: Build Docker Images
-        run: docker-compose build
+        run: docker compose build
       
       - name: Start Services
-        run: docker-compose up -d
+        run: docker compose up -d
       
       - name: Wait for Application to be Ready
         run: |
@@ -93,15 +93,15 @@ jobs:
       - name: Test Application Health
         run: |
           curl -I http://localhost:5000
-          docker-compose ps
+          docker compose ps
       
       - name: Show Application Logs
         if: always()
-        run: docker-compose logs
+        run: docker compose logs
       
       - name: Stop Services
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
 
   dast-zap:
     name: DAST - OWASP ZAP Scan
@@ -117,13 +117,13 @@ jobs:
       
       - name: Start Application
         run: |
-          docker-compose up -d
+          docker compose up -d
           echo "Waiting for services to be ready..."
           sleep 40
       
       - name: Verify Application is Running
         run: |
-          curl -f http://localhost:5000 || (docker-compose logs && exit 1)
+          curl -f http://localhost:5000 || (docker compose logs && exit 1)
       
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
@@ -144,8 +144,8 @@ jobs:
       
       - name: Show Application Logs
         if: always()
-        run: docker-compose logs
+        run: docker compose logs
       
       - name: Stop Application
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
