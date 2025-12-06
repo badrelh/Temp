@@ -7,6 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
+
   sast-bandit:
     runs-on: ubuntu-latest
     steps:
@@ -106,14 +107,13 @@ jobs:
     name: DAST - OWASP ZAP Scan
     runs-on: ubuntu-latest
     needs: build-and-test
+    env:
+      MYSQL_ROOT_PASSWORD: test-mysql-password-123
+      SECRET_KEY: test-secret-key-for-ci
+      FLASK_DEBUG: "false"
+    
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Create .env file
-        run: |
-          echo "MYSQL_ROOT_PASSWORD=test-mysql-password-123" > .env
-          echo "SECRET_KEY=test-secret-key-for-ci" >> .env
-          echo "FLASK_DEBUG=false" >> .env
       
       - name: Start Application
         run: |
